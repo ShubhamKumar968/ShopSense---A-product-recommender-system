@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>ShopSense — Sign In</title>
+<meta name="description" content="Sign in to ShopSense AI Image Recommender."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ── Tokens ── */
+:root{
+  --bg:#07070f;--bg2:#0f0f1c;--surface:#13131f;--card:rgba(19,19,31,.9);
+  --border:rgba(255,255,255,.07);--border-h:rgba(139,92,246,.5);
+  --text:#e8e8f4;--muted:#8888aa;--dim:#44445a;
+  --accent:#8b5cf6;--a2:#06b6d4;--a3:#f59e0b;
+  --glow:rgba(139,92,246,.28);--glow2:rgba(6,182,212,.2);
+  --danger:#ef4444;--success:#22c55e;
+  --r:14px;--rs:10px;
+  --shadow:0 32px 80px rgba(0,0,0,.55);
+}
+[data-theme="light"]{
+  --bg:#f0effa;--bg2:#e6e4f7;--surface:#fff;--card:rgba(255,255,255,.95);
+  --border:rgba(100,80,200,.12);--border-h:rgba(109,40,217,.4);
+  --text:#1a1830;--muted:#5a5480;--dim:#9990bb;
+  --accent:#6d28d9;--a2:#0891b2;--a3:#d97706;
+  --glow:rgba(109,40,217,.15);--glow2:rgba(8,145,178,.1);
+  --shadow:0 32px 80px rgba(100,80,200,.14);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;transition:background .35s,color .35s;
+  position:relative;overflow-x:hidden;
+}
+
+/* ── Background ── */
+.bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);animation:float 14s ease-in-out infinite}
+.o1{width:600px;height:600px;top:-180px;left:-180px;background:radial-gradient(circle,rgba(139,92,246,.32),transparent 65%)}
+.o2{width:500px;height:500px;bottom:-150px;right:-150px;background:radial-gradient(circle,rgba(6,182,212,.2),transparent 65%);animation-delay:-6s}
+.o3{width:350px;height:350px;top:40%;left:50%;background:radial-gradient(circle,rgba(245,158,11,.13),transparent 65%);animation-delay:-10s}
+[data-theme="light"] .orb{opacity:.45}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(35px,-35px) scale(1.05)}66%{transform:translate(-22px,22px) scale(.96)}}
+.grid-tex{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:48px 48px;opacity:.35}
+
+/* ── Theme toggle ── */
+.theme-toggle{
+  position:fixed;top:20px;right:20px;z-index:100;
+  width:50px;height:26px;border-radius:13px;
+  border:1.5px solid var(--border);background:var(--surface);
+  cursor:pointer;display:flex;align-items:center;padding:3px;
+  transition:all .3s;outline:none;
+}
+.theme-toggle:hover{border-color:var(--accent);box-shadow:0 0 12px var(--glow)}
+.toggle-thumb{
+  width:18px;height:18px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--a2));
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;justify-content:center;font-size:10px;
+}
+[data-theme="light"] .toggle-thumb{transform:translateX(24px)}
+
+/* ── Page wrapper ── */
+.page{
+  position:relative;z-index:1;
+  min-height:100vh;display:flex;align-items:stretch;
+}
+
+/* ── Left branding panel ── */
+.panel-l{
+  flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;
+  padding:60px 56px;
+  background:linear-gradient(145deg,rgba(139,92,246,.06),rgba(6,182,212,.03));
+  border-right:1px solid var(--border);
+}
+.brand{display:flex;align-items:center;gap:14px;margin-bottom:64px}
+.brand-ico{
+  width:52px;height:52px;border-radius:14px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--a2));
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+  box-shadow:0 0 28px var(--glow);
+}
+.brand-name{font-family:'Syne',sans-serif;font-weight:800;font-size:24px;
+  background:linear-gradient(90deg,var(--accent),var(--a2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.brand-sub{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+
+.tagline{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(28px,3.2vw,48px);line-height:1.15;margin-bottom:20px}
+.tagline .grad{background:linear-gradient(90deg,var(--accent),var(--a2),var(--a3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:200%;animation:shimmer 4s linear infinite}
+@keyframes shimmer{0%{background-position:0%}100%{background-position:200%}}
+.tagline-desc{color:var(--muted);font-size:15px;line-height:1.75;max-width:400px;margin-bottom:48px}
+
+.features{display:flex;flex-direction:column;gap:14px}
+.feat{
+  display:flex;align-items:center;gap:14px;
+  padding:16px 20px;background:rgba(255,255,255,.025);
+  border:1px solid var(--border);border-radius:var(--r);
+  transition:border-color .3s,transform .3s;
+}
+.feat:hover{border-color:rgba(139,92,246,.3);transform:translateX(5px)}
+[data-theme="light"] .feat{background:rgba(109,40,217,.04)}
+.feat-ico{width:40px;height:40px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px}
+.f-purple{background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.22)}
+.f-cyan{background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.18)}
+.f-amber{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.18)}
+[data-theme="light"] .f-purple{background:rgba(109,40,217,.08)}
+[data-theme="light"] .f-cyan{background:rgba(8,145,178,.07)}
+[data-theme="light"] .f-amber{background:rgba(217,119,6,.07)}
+.feat-txt strong{font-size:14px;font-weight:600;display:block;color:var(--text)}
+.feat-txt span{font-size:12px;color:var(--muted)}
+
+/* ── Right form panel ── */
+.panel-r{
+  width:460px;flex-shrink:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:60px 48px;
+  background:var(--card);
+  backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+}
+.form-box{width:100%;max-width:360px}
+
+.form-head{text-align:center;margin-bottom:32px}
+.form-title{font-family:'Syne',sans-serif;font-weight:800;font-size:26px;margin-bottom:8px;color:var(--text)}
+.form-sub{font-size:14px;color:var(--muted)}
+
+/* Tabs */
+.tabs{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);padding:4px;gap:4px;margin-bottom:24px}
+.tab{flex:1;padding:10px;border:none;border-radius:7px;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:12px;
+  text-transform:uppercase;letter-spacing:.05em;cursor:pointer;
+  background:transparent;color:var(--muted);transition:all .25s}
+.tab.on{background:linear-gradient(135deg,var(--accent),#6d28d9);color:#fff;box-shadow:0 4px 14px var(--glow)}
+[data-theme="light"] .tab.on{background:linear-gradient(135deg,var(--accent),#4c1d95)}
+
+/* Alert */
+.alert{display:none;padding:11px 14px;border-radius:var(--rs);font-size:13px;border:1px solid;margin-bottom:12px;gap:8px;align-items:flex-start}
+.alert.on{display:flex}
+.alert.err{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.28);color:#f87171}
+.alert.ok{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.28);color:#4ade80}
+
+/* Fields */
+.form{display:flex;flex-direction:column;gap:16px}
+.f-group{display:flex;flex-direction:column;gap:6px}
+.f-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.f-wrap{position:relative;display:flex;align-items:center}
+.f-ico{position:absolute;left:13px;font-size:15px;pointer-events:none;opacity:.5;z-index:1}
+.inp{
+  width:100%;padding:12px 14px 12px 40px;
+  background:var(--bg2);border:1.5px solid var(--border);
+  border-radius:var(--rs);color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:14px;
+  outline:none;transition:all .25s;
+}
+.inp::placeholder{color:var(--dim)}
+.inp:focus{border-color:var(--border-h);background:rgba(139,92,246,.04);box-shadow:0 0 0 3px var(--glow)}
+[data-theme="light"] .inp{background:var(--bg2)}
+[data-theme="light"] .inp:focus{background:rgba(109,40,217,.04)}
+.eye-btn{position:absolute;right:12px;background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px;padding:4px;transition:color .2s;z-index:1}
+.eye-btn:hover{color:var(--accent)}
+
+.forgot-row{text-align:right;margin-top:-8px}
+.forgot-row a{font-size:12px;color:var(--accent);text-decoration:none;opacity:.8;transition:opacity .2s}
+.forgot-row a:hover{opacity:1}
+
+/* Submit */
+.submit-btn{
+  width:100%;padding:14px;margin-top:4px;
+  background:linear-gradient(135deg,var(--accent),#6d28d9);
+  border:none;border-radius:var(--rs);color:#fff;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:14px;
+  letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
+  transition:all .25s;box-shadow:0 8px 24px var(--glow);
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.submit-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 14px 32px var(--glow)}
+.submit-btn:active:not(:disabled){transform:translateY(0)}
+.submit-btn:disabled{opacity:.55;cursor:not-allowed}
+.spinner{width:17px;height:17px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+.submit-btn.loading .btn-lbl{display:none}
+.submit-btn.loading .spinner{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.divider{display:flex;align-items:center;gap:10px;margin:18px 0;color:var(--dim);font-size:12px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.note{text-align:center;font-size:12px;color:var(--dim);line-height:1.6}
+.note a{color:var(--accent);text-decoration:none}
+
+/* ── Mobile (≤ 768px): stack vertically ── */
+@media(max-width:768px){
+  body{overflow-x:hidden}
+  .page{flex-direction:column;align-items:stretch}
+  .panel-l{
+    padding:40px 28px 36px;
+    border-right:none;border-bottom:1px solid var(--border);
+  }
+  .brand{margin-bottom:28px}
+  .tagline{font-size:clamp(24px,6vw,36px);margin-bottom:14px}
+  .tagline-desc{display:none}
+  .features{flex-direction:row;flex-wrap:wrap;gap:10px}
+  .feat{flex:1 1 calc(50% - 10px);min-width:140px;padding:12px 14px}
+  .feat:hover{transform:none}
+  .feat-ico{width:34px;height:34px;font-size:15px}
+  .panel-r{
+    width:100%;padding:36px 24px 48px;
+    min-height:unset;
+  }
+  .form-box{max-width:100%}
+  .theme-toggle{top:14px;right:14px}
+}
+@media(max-width:480px){
+  .panel-l{padding:32px 20px 28px}
+  .features{flex-direction:column}
+  .feat{flex:unset}
+  .panel-r{padding:28px 20px 44px}
+  .form-title{font-size:22px}
+}
+</style>
+</head>
+<body>
+
+<!-- Theme Toggle -->
+<button class="theme-toggle" id="themeBtn" aria-label="Toggle theme">
+  <div class="toggle-thumb" id="themeThumb">🌙</div>
+</button>
+
+<!-- Animated background -->
+<div class="bg-wrap">
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
+</div>
+<div class="grid-tex"></div>
+
+<div class="page">
+
+  <!-- LEFT: Branding -->
+  <div class="panel-l">
+    <div class="brand">
+      <div class="brand-ico">🔍</div>
+      <div>
+        <div class="brand-name">ShopSense</div>
+        <div class="brand-sub">AI Image Recommender</div>
+      </div>
+    </div>
+
+    <h1 class="tagline">
+      Find Visually<br>
+      <span class="grad">Similar Products</span><br>
+      Instantly
+    </h1>
+    <p class="tagline-desc">
+      Powered by OpenAI CLIP embeddings and cosine similarity — ShopSense surfaces visually relevant products from your catalog in milliseconds.
+    </p>
+
+    <div class="features">
+      <div class="feat">
+        <div class="feat-ico f-purple">🧠</div>
+        <div class="feat-txt">
+          <strong>CLIP Embeddings</strong>
+          <span>OpenAI vision model vectors</span>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-ico f-cyan">⚡</div>
+        <div class="feat-txt">
+          <strong>Real-time Search</strong>
+          <span>Cosine similarity at scale</span>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-ico f-amber">🔒</div>
+        <div class="feat-txt">
+          <strong>JWT Secured</strong>
+          <span>FastAPI + Express backend</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Form -->
+  <div class="panel-r">
+    <div class="form-box">
+
+      <div class="form-head">
+        <div class="form-title" id="formTitle">Welcome Back 👋</div>
+        <div class="form-sub" id="formSub">Sign in to explore recommendations</div>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="tabs" role="tablist" aria-label="Auth mode">
+        <button class="tab on" id="tabLogin" role="tab" aria-selected="true" onclick="switchMode('login')">Login</button>
+        <button class="tab" id="tabReg" role="tab" aria-selected="false" onclick="switchMode('register')">Register</button>
+      </div>
+
+      <!-- Alert -->
+      <div class="alert" id="alertBox" role="alert"></div>
+
+      <!-- Auth Form -->
+      <form class="form" id="authForm" novalidate autocomplete="on">
+
+        <!-- Username (register only) -->
+        <div class="f-group" id="uGroup" style="display:none">
+          <label class="f-label" for="inp-user">Username</label>
+          <div class="f-wrap">
+            <span class="f-ico">👤</span>
+            <input class="inp" type="text" id="inp-user" placeholder="e.g. john_doe" autocomplete="username"/>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="f-group">
+          <label class="f-label" for="inp-email">Email Address</label>
+          <div class="f-wrap">
+            <span class="f-ico">✉️</span>
+            <input class="inp" type="email" id="inp-email" placeholder="you@example.com" autocomplete="email" required/>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="f-group">
+          <label class="f-label" for="inp-pwd">Password</label>
+          <div class="f-wrap">
+            <span class="f-ico">🔑</span>
+            <input class="inp" type="password" id="inp-pwd" placeholder="••••••••" autocomplete="current-password" required/>
+            <button type="button" class="eye-btn" id="eyeBtn" aria-label="Toggle password visibility">👁</button>
+          </div>
+        </div>
+
+        <!-- Forgot (login only) -->
+        <div class="forgot-row" id="forgotRow">
+          <a href="#" tabindex="-1">Forgot password?</a>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="submit-btn" id="submitBtn">
+          <span class="btn-lbl" id="btnLbl">Sign In →</span>
+          <div class="spinner"></div>
+        </button>
+      </form>
+
+      <div class="divider">or continue with</div>
+      <div class="note">
+        By signing in you agree to our <a href="#">Terms</a> &amp; <a href="#">Privacy Policy</a>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+const AUTH_BASE = 'http://localhost:5000/api/v1';
+let mode = 'login';
+let isDark = true;
+
+// ── Theme ────────────────────────────────────────────────────────────────────
+const themeBtn   = document.getElementById('themeBtn');
+const themeThumb = document.getElementById('themeThumb');
+
+// Restore saved theme
+const saved = localStorage.getItem('theme');
+if (saved === 'light') { isDark = false; applyTheme(); }
+
+themeBtn.addEventListener('click', () => { isDark = !isDark; applyTheme(); localStorage.setItem('theme', isDark ? 'dark' : 'light'); });
+
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  themeThumb.textContent = isDark ? '🌙' : '☀️';
+}
+
+// ── Redirect if already logged in ────────────────────────────────────────────
+if (localStorage.getItem('accessToken')) { window.location.replace('./index.html'); }
+
+// ── Password toggle ───────────────────────────────────────────────────────────
+const eyeBtn = document.getElementById('eyeBtn');
+const inpPwd = document.getElementById('inp-pwd');
+eyeBtn.addEventListener('click', () => {
+  const show = inpPwd.type === 'password';
+  inpPwd.type = show ? 'text' : 'password';
+  eyeBtn.textContent = show ? '🙈' : '👁';
+});
+
+// ── Mode switch ───────────────────────────────────────────────────────────────
+const tabLogin  = document.getElementById('tabLogin');
+const tabReg    = document.getElementById('tabReg');
+const uGroup    = document.getElementById('uGroup');
+const forgotRow = document.getElementById('forgotRow');
+const formTitle = document.getElementById('formTitle');
+const formSub   = document.getElementById('formSub');
+const btnLbl    = document.getElementById('btnLbl');
+
+function switchMode(m) {
+  mode = m;
+  hideAlert();
+  const isLogin = m === 'login';
+  formTitle.textContent = isLogin ? 'Welcome Back 👋'       : 'Create Account ✨';
+  formSub.textContent   = isLogin ? 'Sign in to explore recommendations' : 'Join ShopSense — it\'s free';
+  btnLbl.textContent    = isLogin ? 'Sign In →'              : 'Create Account →';
+  uGroup.style.display  = isLogin ? 'none'                   : 'flex';
+  forgotRow.style.display = isLogin ? 'block'                : 'none';
+  tabLogin.classList.toggle('on', isLogin);
+  tabReg.classList.toggle('on', !isLogin);
+  tabLogin.setAttribute('aria-selected', isLogin);
+  tabReg.setAttribute('aria-selected',  !isLogin);
+}
+
+// ── Alert ─────────────────────────────────────────────────────────────────────
+const alertBox = document.getElementById('alertBox');
+function showAlert(msg, type = 'err') {
+  alertBox.textContent = (type === 'err' ? '⚠ ' : '✓ ') + msg;
+  alertBox.className   = `alert ${type} on`;
+}
+function hideAlert() { alertBox.className = 'alert'; }
+
+// ── Submit ────────────────────────────────────────────────────────────────────
+const authForm  = document.getElementById('authForm');
+const submitBtn = document.getElementById('submitBtn');
+
+authForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  hideAlert();
+
+  const email    = document.getElementById('inp-email').value.trim();
+  const password = document.getElementById('inp-pwd').value;
+  const username = document.getElementById('inp-user').value.trim();
+
+  if (!email || !password)                     { showAlert('Email and password are required.'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showAlert('Please enter a valid email address.'); return; }
+  if (password.length < 6)                     { showAlert('Password must be at least 6 characters.'); return; }
+  if (mode === 'register' && !username)        { showAlert('Username is required.'); return; }
+
+  submitBtn.disabled = true;
+  submitBtn.classList.add('loading');
+
+  const payload  = { email, password };
+  if (mode === 'register') payload.username = username;
+  const endpoint = mode === 'login' ? '/login' : '/register';
+
+  try {
+    const res  = await fetch(`${AUTH_BASE}${endpoint}`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Authentication failed');
+
+    localStorage.setItem('accessToken',  data.accessToken);
+    localStorage.setItem('refreshToken', data.refreshToken);
+    if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
+
+    showAlert(mode === 'login' ? 'Login successful! Redirecting…' : 'Account created! Redirecting…', 'ok');
+    setTimeout(() => window.location.replace('./index.html'), 900);
+  } catch (err) {
+    showAlert(err.message);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.classList.remove('loading');
+  }
+});
+</script>
+</body>
+</html>

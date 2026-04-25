@@ -1,0 +1,14 @@
+# Ignore backend dependencies and Environment variables
+backend/node_modules/
+backend/.env
+
+# Python virtual environment
+ml_service/.venv/
+ml_service/__pycache__/
+
+# Ignore large pickle files (if they are >50MB GitHub might reject them)
+ml_service/*.pkl
+
+# Ignore OS specific files
+.DS_Store
+Thumbs.db
