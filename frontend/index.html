@@ -1110,6 +1110,12 @@
   <!-- Auth handled by login.html -->
 
   <script>
+    // --- WAKE UP CALLS ---
+    window.onload = () => {
+        console.log("Waking up services...");
+        fetch('https://shopsense-backend-stjn.onrender.com/api/v1/health').catch(e => console.log("Backend waking..."));
+        fetch('https://shopsense-ml-service.onrender.com/').catch(e => console.log("ML Service waking..."));
+    };
     // All API traffic goes through Express (port 5000) under /api/v1
     const API_BASE = 'https://shopsense-backend-stjn.onrender.com/api/v1';
     const AUTH_BASE = 'https://shopsense-backend-stjn.onrender.com/api/v1';

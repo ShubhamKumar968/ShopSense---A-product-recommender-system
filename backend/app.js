@@ -29,29 +29,32 @@ const PYTHON_API_URL = process.env.PYTHON_API_URL || 'http://localhost:8000';
 // ── Protected proxy routes ────────────────────────────────────────────────────
 // All protected endpoints are under /api/v1 — auth middleware guards each one.
 
+// ── Protected proxy routes ────────────────────────────────────────────────────
+
 app.get('/api/v1/products', auth, async (req, res) => {
   try {
     const response = await axios.get(`${PYTHON_API_URL}/products`);
     res.json(response.data);
   } catch (error) {
     console.error('Python API Error (products):', error.message);
-    res
-      .status(error.response?.status || 500)
-      .json(error.response?.data || { message: 'Error fetching products' });
+    // Render 502 check
+    if (error.response?.status === 502) {
+      return res.status(503).json({ message: 'ML Service is waking up... Please try again in 30 seconds.' });
+    }
+    res.status(error.response?.status || 500).json(error.response?.data || { message: 'Error fetching products' });
   }
 });
 
 app.get('/api/v1/search', auth, async (req, res) => {
   try {
-    const response = await axios.get(`${PYTHON_API_URL}/search`, {
-      params: req.query,
-    });
+    const response = await axios.get(`${PYTHON_API_URL}/search`, { params: req.query });
     res.json(response.data);
   } catch (error) {
     console.error('Python API Error (search):', error.message);
-    res
-      .status(error.response?.status || 500)
-      .json(error.response?.data || { message: 'Error searching products' });
+    if (error.response?.status === 502) {
+      return res.status(503).json({ message: 'ML Service is waking up... Please try again in 30 seconds.' });
+    }
+    res.status(error.response?.status || 500).json(error.response?.data || { message: 'Error searching products' });
   }
 });
 
@@ -62,9 +65,10 @@ app.post('/api/v1/recommend', auth, async (req, res) => {
     res.json(response.data);
   } catch (error) {
     console.error('Python API Error (recommend):', error.message);
-    res
-      .status(error.response?.status || 500)
-      .json(error.response?.data || { message: 'Error getting recommendations' });
+    if (error.response?.status === 502) {
+      return res.status(503).json({ message: 'ML Service is waking up... Please try again in 30 seconds.' });
+    }
+    res.status(error.response?.status || 500).json(error.response?.data || { message: 'Error getting recommendations' });
   }
 });
 
